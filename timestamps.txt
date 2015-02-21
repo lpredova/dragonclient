@@ -1,0 +1,8 @@
+// WARNING
+// This file contains sensitive info about timestamps and please DO NOT TOUCH it.
+// Do not try to modify od add something to this file at any cost !
+#Battle 2015-01-01 17:47:00
+#Debug  2015-02-18 17:30:00
+#General 2015-02-18 11:40:00
+#Party 2015-02-18 12:22:00
+Testarion 2015-02-19 12:21:00
