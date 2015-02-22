@@ -45,4 +45,4 @@ class General(Parser):
         request["general"] = general
         request["character"] = self.character
 
-        self.send_request(self.url, request)
+        self.send_request(self.url, request,'#General')

@@ -42,7 +42,5 @@ class Battle(Parser):
 
         request = {"character": self.character,
                    "battle": battles}
-        # request["battle"] = battles
-        #request["character"] = self.character
 
-        self.send_request(self.url, request)
+        self.send_request(self.url, request,'#Battle')

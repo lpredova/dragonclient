@@ -31,11 +31,11 @@ class Party(Parser):
 
                 i = self.parse_log_timestamp(line)
                 event["time"] = "%s-%s-%s %s:%s" % (i.year, i.month, i.day, i.hour, i.minute)
-                event["event"] = self.parse_log_text_data(line).decode('utf-8').strip()
+                event["event"] = self.parse_log_text_data(line).replace(']', "").replace('[', "").decode('utf-8').strip()
 
                 parties.append(event)
 
         request["parties"] = parties
         request["character"] = self.character
 
-        self.send_request(self.url, request)
+        self.send_request(self.url, request,'#Party')

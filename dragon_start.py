@@ -2,9 +2,13 @@
 # -*- coding: utf-8 -*-
 
 __author__ = 'lovro'
-from sys import platform as _platform
-import getpass
+
 import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
+
+from sys import platform as _platform
 from os import listdir
 from os.path import isfile, join
 
@@ -12,6 +16,7 @@ import subprocess
 import signal
 import psutil
 import time
+import getpass
 
 # parsers
 from parsers.battle import Battle
@@ -44,7 +49,7 @@ class Client:
         try:
             os.kill(self.PID, signal.SIGKILL)
         except BaseException:
-            print "Tnx for contribution. FOI DRAGON team"
+            print "THANK YOU 4 CONTRIBUTION!"
 
 
     def check_os(self):
@@ -136,27 +141,31 @@ class Client:
 
         for log_file in files:
             if log_file == battle_file:
+                print "battle"
                 battle = Battle()
                 battle.get_battle_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, battle_file), self.character)
 
             elif log_file == debug_file:
+                print "debug"
                 debug = Debug()
                 debug.get_debug_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, debug_file), self.character)
 
             elif log_file == general_file:
+                print "general"
                 general = General()
                 general.get_general_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, general_file), self.character)
 
             elif log_file == party_file:
+                print "party"
                 party = Party()
                 party.get_party_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, party_file), self.character)
 
-            # Todo remove in testing phase
             elif log_file[0] == ".":
                 continue
 
             # if log is nothing frome above then(probably) we have whisper log
             else:
+                print "whisper"
                 whisper = Whisper()
                 whisper.get_whisper_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, log_file), log_file, self.character)
 
@@ -178,15 +187,13 @@ class Client:
                 character = {"character": character}
                 payload = json.dumps(character)
 
-                print payload
                 headers = {'content-type': 'application/json'}
 
                 r = requests.post(BASE_URL + "user", data=payload, headers=headers)
-                print r.data
-
-                return character
+                data = r.json()
+                if data["status"] == "200":
+                    return character
             except:
-                print "except"
                 continue
 
 
@@ -220,7 +227,6 @@ class Client:
 
 
 if __name__ == '__main__':
-    print "Starting script...\n"
     client = Client()
     client.check_os()
     client.start_mana_plus()

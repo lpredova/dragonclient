@@ -37,12 +37,14 @@ class Debug(Parser):
                 i = self.parse_log_timestamp(line)
                 event["time"] = "%s-%s-%s %s:%s" % (i.year, i.month, i.day, i.hour, i.minute)
                 try:
-                    event["event"] = self.parse_log_text_data(line).split(']')[1].decode('utf-8').strip()
+                    event["event"] = self.parse_log_text_data(line).split(']')[1].replace(']', "").replace('[', "")\
+                        .decode('utf-8').strip()
                 except:
-                    event["event"] = self.parse_log_text_data(line).split(']')[0].decode('utf-8').strip()
+                    event["event"] = self.parse_log_text_data(line).split(']')[0].replace(']', "").replace('[', "")\
+                        .decode('utf-8').strip()
                 debugs.append(event)
 
         request["debug"] = debugs
         request["character"] = self.character
 
-        self.send_request(self.url, request)
+        self.send_request(self.url, request,'#Debug')

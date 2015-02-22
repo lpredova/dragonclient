@@ -3,7 +3,7 @@
 
 __author__ = 'lovro'
 import os
-from  datetime import datetime as dt
+from datetime import datetime as dt
 
 
 # test
@@ -14,7 +14,6 @@ from os import remove, close
 # http requests
 import json
 import requests
-from bson.json_util import dumps
 
 
 class Parser:
@@ -113,7 +112,9 @@ class Parser:
         compares timestamps.txt from relevant log file and timestamps.txt and returns logical expression
         """
         if self.check_timestamp_exists_db(category_type.split('.')[0]):
-            # print "comparing " + str(self.get_latest_timestamp_file(path)) + str(self.get_timestamp_db(category_type.split('.')[0]))
+
+            #print "comparing for "+ category_type + " " + str(self.get_latest_timestamp_file(path)) + str(self.get_timestamp_db(category_type.split('.')[0]))
+
             if self.get_latest_timestamp_file(path) > self.get_timestamp_db(category_type.split('.')[0]):
                 # create log which will be sent to server
                 return True
@@ -145,10 +146,12 @@ class Parser:
             if line[0] == '/':
                 continue
             if category_type in line:
-
-                time = line.split(':')[1]
-                if len(time) == 1:
-
+                try:
+                    time = line.split(':')[1]
+                    # There is already something written so we proceed
+                    searchfile.close()
+                    return self.parse_db_timestamp(line)
+                except:
                     # first run, we need to save latest and to not to go to recursion we will search again
                     searchfile.close()
                     if self.set_timestamp_db(category_type, self.latest_timestamp):
@@ -158,12 +161,6 @@ class Parser:
                                 continue
                             if category_type in line:
                                 return self.parse_db_timestamp(line)
-
-                # There is already something written so we proceed
-                else:
-                    searchfile.close()
-                    return self.parse_db_timestamp(line)
-
 
     def set_timestamp_db(self, category_type, timestamp):
         """
@@ -178,6 +175,7 @@ class Parser:
                 searchfile.close()
                 return True
 
+        searchfile.close()
         return False
 
 
@@ -203,8 +201,24 @@ class Parser:
         # Move new file
         move(abs_path, file_path)
 
-    def send_request(self, url_path, request):
+    def send_request(self, url_path, request, log_type):
 
+        """
+        Method that sends json request to server and if everything is OK then we write new time to timestamps.txt
+        :param url_path:
+        :param request:
+        """
         payload = json.dumps(request)
+        print payload
         headers = {'content-type': 'application/json'}
         r = requests.post(self.BASE_URL + url_path, data=payload, headers=headers)
+
+        print log_type + "  " + self.BASE_URL + url_path + "   " + payload
+
+        data = r.json()
+        if data["status"] == "200":
+
+            if self.set_timestamp_db(log_type, dt.now()):
+                print "timestamps updated..."
+            else:
+                print "failed"

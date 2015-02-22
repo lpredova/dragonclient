@@ -16,7 +16,6 @@ class Whisper(Parser):
         if self.check_log_file_exists(path):
             if self.check_whisper_exists_db(self.whisper_buddy):
                 if self.compare_with_latest_timestamp(file_name, path):
-
                     self.character = user_character
                     self.create_whisper_log_request(path)
             else:
@@ -28,7 +27,7 @@ class Whisper(Parser):
         """
         try:
             with open(self.timestamps_db_file, "a") as myfile:
-                myfile.write(category_type + " " + str(timestamp) + '\n')
+                myfile.write(category_type + " " + str("2015-01-01 00:00:00") + '\n')
                 myfile.close()
             return True
         except:
@@ -79,4 +78,4 @@ class Whisper(Parser):
         request["whispers"] = whispers
         request["character"] = self.character
 
-        self.send_request(self.url, request)
+        self.send_request(self.url, request, self.whisper_buddy)
