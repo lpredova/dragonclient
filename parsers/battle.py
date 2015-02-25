@@ -34,9 +34,9 @@ class Battle(Parser):
                 event = {}
 
                 i = self.parse_log_timestamp(line)
-                event["user"] = self.parse_log_speaker(line).decode('utf-8')
+                event["user"] = self.parse_log_speaker(line)
                 event["time"] = "%s-%s-%s %s:%s" % (i.year, i.month, i.day, i.hour, i.minute)
-                event["event"] = self.parse_log_text_data(line).replace(']', "").decode('utf-8').strip()
+                event["event"] = self.parse_log_text_data(line).replace(']', "").strip()
 
                 battles.append(event)
 

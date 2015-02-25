@@ -38,10 +38,10 @@ class Debug(Parser):
                 event["time"] = "%s-%s-%s %s:%s" % (i.year, i.month, i.day, i.hour, i.minute)
                 try:
                     event["event"] = self.parse_log_text_data(line).split(']')[1].replace(']', "").replace('[', "")\
-                        .decode('utf-8').strip()
+                        .strip()
                 except:
                     event["event"] = self.parse_log_text_data(line).split(']')[0].replace(']', "").replace('[', "")\
-                        .decode('utf-8').strip()
+                        .strip()
                 debugs.append(event)
 
         request["debug"] = debugs

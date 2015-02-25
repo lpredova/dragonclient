@@ -3,26 +3,27 @@ from parsers.parser import Parser
 __author__ = 'lovro'
 
 
-class Party(Parser):
-    url = 'party'
+class Trade(Parser):
+    url = 'trade'
     character = ''
 
-    def get_party_log_data(self, path, user_character):
+    def get_trades_log_data(self, path, user_character):
         if self.check_log_file_exists(path):
-            if self.compare_with_latest_timestamp('#Party', path):
+            if self.compare_with_latest_timestamp('#Trade', path):
                 self.character = user_character
-                self.create_party_log_request(path)
+                self.create_trade_log_request(path)
 
 
-    def create_party_log_request(self, path):
+    def create_trade_log_request(self, path):
         """
         Method that creates debug log request
         :param path:
         :param category_type:
         """
-        last_timestamp = self.get_timestamp_db('#Party')
+        print path
+        last_timestamp = self.get_timestamp_db('#Trade')
         request = {}
-        parties = []
+        trades = []
 
         searchfile = open(path, "r")
         for line in searchfile:
@@ -33,9 +34,9 @@ class Party(Parser):
                 event["time"] = "%s-%s-%s %s:%s" % (i.year, i.month, i.day, i.hour, i.minute)
                 event["event"] = self.parse_log_text_data(line).replace(']', "").replace('[', "").strip()
 
-                parties.append(event)
+                trades.append(event)
 
-        request["parties"] = parties
+        request["trades"] = trades
         request["character"] = self.character
 
-        self.send_request(self.url, request,'#Party')
+        self.send_request(self.url, request,'#Trade')

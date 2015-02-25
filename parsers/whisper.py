@@ -69,9 +69,9 @@ class Whisper(Parser):
                 event["time"] = "%s-%s-%s %s:%s" % (i.year, i.month, i.day, i.hour, i.minute)
                 event["user"] = self.parse_log_speaker(line).decode('utf-8').strip()
                 try:
-                    event["event"] = self.parse_log_text_data(line).split(']')[1].decode('utf-8').strip()
+                    event["event"] = self.parse_log_text_data(line).split(']')[1].strip()
                 except:
-                    event["event"] = self.parse_log_text_data(line).split(']')[0].decode('utf-8').strip()
+                    event["event"] = self.parse_log_text_data(line).split(']')[0].strip()
 
                 whispers.append(event)
 

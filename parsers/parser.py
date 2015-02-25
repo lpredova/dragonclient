@@ -19,7 +19,7 @@ import requests
 class Parser:
     user_char = ''
 
-    BASE_URL = 'http://localhost:5000/mw/api/v1/'
+    BASE_URL = 'http://178.62.125.198:5000/mw/api/v1/'
 
     latest_timestamp = ''
     timestamps_db_file = 'timestamps.txt'
@@ -171,8 +171,8 @@ class Parser:
         searchfile = open(self.timestamps_db_file, "r+")
         for line in searchfile:
             if category_type in line:
-                self.replace(self.timestamps_db_file, line, category + " " + str(timestamp) + "\n")
                 searchfile.close()
+                self.replace(self.timestamps_db_file, line, category + " " + str(timestamp) + "\n")
                 return True
 
         searchfile.close()
@@ -187,19 +187,22 @@ class Parser:
         :param pattern:
         :param subst:
         """
-        fh, abs_path = mkstemp()
-        new_file = open(abs_path, 'w')
-        old_file = open(file_path)
-        for line in old_file:
-            new_file.write(line.replace(pattern, subst))
-        # close temp file
-        new_file.close()
-        close(fh)
-        old_file.close()
-        # Remove original file
-        remove(file_path)
-        # Move new file
-        move(abs_path, file_path)
+        try:
+            fh, abs_path = mkstemp()
+            new_file = open(abs_path, 'w')
+            old_file = open(file_path)
+            for line in old_file:
+                new_file.write(line.replace(pattern, subst))
+            # close temp file
+            new_file.close()
+            close(fh)
+            old_file.close()
+            # Remove original file
+            remove(file_path)
+            # Move new file
+            move(abs_path, file_path)
+        except Exception,e:
+            print str(e)
 
     def send_request(self, url_path, request, log_type):
 

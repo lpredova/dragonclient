@@ -37,8 +37,8 @@ class General(Parser):
 
                 i = self.parse_log_timestamp(line)
                 event["time"] = "%s-%s-%s %s:%s" % (i.year, i.month, i.day, i.hour, i.minute)
-                event["user"] = self.parse_log_speaker(line).decode('utf-8').strip()
-                event["event"] = self.parse_log_text_data(line).decode('latin-1').strip()
+                event["user"] = self.parse_log_speaker(line).strip()
+                event["event"] = self.parse_log_text_data(line).strip()
 
                 general.append(event)
 

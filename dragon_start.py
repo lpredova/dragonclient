@@ -24,6 +24,7 @@ from parsers.general import General
 from parsers.debug import Debug
 from parsers.party import Party
 from parsers.whisper import Whisper
+from parsers.trades import Trade
 
 import requests
 import json
@@ -59,26 +60,38 @@ class Client:
         if _platform == "linux" or _platform == "linux2":
             self.os = "linux"
             # self.PATH_TO_LOGS_FOLDER = ""
+            # UBUNTU 14.04
+            #self.PATH_TO_LOGS_FOLDER = "~/.local/share/mana/logs/"
+            self.PATH_TO_LOGS_FOLDER = os.path.join(os.path.sep, ".local", "share", "mana", "logs",
+                                                    self.GAME_SERVER_IP, self.get_current_month(),
+                                                    self.get_current_day())
 
         elif _platform == "darwin":
             self.os = "mac"
             # produciton code
-            '''self.PATH_TO_LOGS_FOLDER = os.path.join(os.path.sep, "Users", self.get_unix_user(),
+            self.PATH_TO_LOGS_FOLDER = os.path.join(os.path.sep, "Users", self.get_computer_user(),
                                                     "Library", "Application Support",
                                                     "ManaPlus", "logs",
                                                     self.GAME_SERVER_IP, self.get_current_month(),
-                                                    self.get_current_day())'''
+                                                    self.get_current_day())
 
             # testing code
-            self.PATH_TO_LOGS_FOLDER = os.path.join(os.path.sep, "Users", self.get_unix_user(),
+            '''self.PATH_TO_LOGS_FOLDER = os.path.join(os.path.sep, "Users", self.get_computer_user(),
                                                     "Library", "Application Support",
                                                     "ManaPlus", "logs",
                                                     self.GAME_SERVER_IP, "2015-01",
-                                                    "21")
+                                                    "21")'''
 
         elif _platform == "win32" or _platform == "cygwin":
+
+            # Tested with "C:\Users\Toplomjer\AppData\Local\Mana"
+            #Windows 7
             self.os = "win"
-            # self.PATH_TO_LOGS_FOLDER = "/Users/lovro/Library/Application Support/ManaPlus/logs/188.226.189.127"
+            self.PATH_TO_LOGS_FOLDER = os.path.join("C:\Users",
+                                                    self.get_computer_user(), "AppData"
+                                                    , "Local", "Mana", "logs",
+                                                    self.GAME_SERVER_IP, self.get_current_month(),
+                                                    self.get_current_day())
 
     def start_mana_plus(self):
         """
@@ -100,7 +113,13 @@ class Client:
             print "linux"
 
         if (self.os == "win"):
-            print "win"
+            try:
+                bashCommand = "C:\Program Files (x86)\Mana\manaplus.exe"
+                process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+                self.start_process_listener()
+            except OSError as e:
+                if e.errno == os.errno.ENOENT:
+                    return False
 
     def start_process_listener(self):
         print "I'm listening..."
@@ -115,7 +134,7 @@ class Client:
                     running = True
                     print "..."
 
-            if time.time() - start_time > 2:  # no of seconds
+            if time.time() - start_time > 3:  # no of seconds
                 self.get_chat_logs()
                 start_time = time.time()
 
@@ -132,42 +151,67 @@ class Client:
         debug_file = '#Debug.log'
         general_file = '#General.log'
         party_file = '#Party.log'
+        trade_file = '#Trade.log'
 
         if not os.path.exists(self.PATH_TO_LOGS_FOLDER):
-            sys.exit()
+            print "path does not exist"
+            return 0
         files = [f for f in listdir(self.PATH_TO_LOGS_FOLDER) if isfile(join(self.PATH_TO_LOGS_FOLDER, f))]
 
         self.character = self.get_character()
 
         for log_file in files:
             if log_file == battle_file:
-                print "battle"
-                battle = Battle()
-                battle.get_battle_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, battle_file), self.character)
+                try :
+                    print "battle"
+                    battle = Battle()
+                    battle.get_battle_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, battle_file), self.character)
+                except:
+                    continue
 
             elif log_file == debug_file:
-                print "debug"
-                debug = Debug()
-                debug.get_debug_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, debug_file), self.character)
+                try :
+                    print "debug"
+                    debug = Debug()
+                    debug.get_debug_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, debug_file), self.character)
+                except:
+                    continue
 
             elif log_file == general_file:
-                print "general"
-                general = General()
-                general.get_general_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, general_file), self.character)
+                try:
+                    print "general"
+                    general = General()
+                    general.get_general_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, general_file), self.character)
+                except:
+                    continue
 
             elif log_file == party_file:
-                print "party"
-                party = Party()
-                party.get_party_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, party_file), self.character)
+                try:
+                    print "party"
+                    party = Party()
+                    party.get_party_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, party_file), self.character)
+                except:
+                    continue
+
+            elif log_file == trade_file:
+                try:
+                    print "trade"
+                    trade = Trade()
+                    trade.get_trades_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, trade_file), self.character)
+                except:
+                    continue
 
             elif log_file[0] == ".":
                 continue
 
             # if log is nothing frome above then(probably) we have whisper log
             else:
-                print "whisper"
-                whisper = Whisper()
-                whisper.get_whisper_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, log_file), log_file, self.character)
+                try:
+                    print "whisper"
+                    whisper = Whisper()
+                    whisper.get_whisper_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, log_file), log_file, self.character)
+                except:
+                    continue
 
     def get_character(self):
         """
@@ -175,18 +219,20 @@ class Client:
         returns char name
         """
 
-        BASE_URL = 'http://localhost:5000/mw/api/v1/'
+        BASE_URL = 'http://178.62.125.198:5000/mw/api/v1/'
 
         character = ''
-        searchfile = open(os.path.join(self.PATH_TO_LOGS_FOLDER, '#Battle.log'), "r")
+        try:
+            searchfile = open(os.path.join(self.PATH_TO_LOGS_FOLDER, '#Battle.log'), "r")
+        except:
+            searchfile = open(os.path.join(self.PATH_TO_LOGS_FOLDER, '#General.log'), "r")
+
+
         for line in searchfile:
             try:
-                character = line.split()[1].split(':')[0]
-                # Todo check if char exists on server
-
+                character = line.split(']')[1].split(':')[0].lstrip()
                 character = {"character": character}
                 payload = json.dumps(character)
-
                 headers = {'content-type': 'application/json'}
 
                 r = requests.post(BASE_URL + "user", data=payload, headers=headers)
@@ -202,7 +248,7 @@ class Client:
             print "Sending logs to server"
 
 
-    def get_unix_user(self):
+    def get_computer_user(self):
         """
         Method that provides current osx user so we could read filesystem tree to logs
         :return:

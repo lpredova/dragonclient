@@ -1,8 +1,8 @@
 // WARNING
 // This file contains sensitive info about timestamps and please DO NOT TOUCH it.
 // Do not try to modify od add something to this file at any cost !
-#Battle 2015-02-22 21:36:51.511113
-#Debug 2015-02-22 21:36:51.521438
-#General 2015-02-22 21:36:51.538372
-#Party 2015-02-22 21:36:51.548046
-Testarion 2015-02-22 21:36:53.595622
+#Battle 2015-02-25 18:04:02.548867
+#Debug 2015-02-25 18:06:06.831055
+#General 2015-02-25 18:08:04.999635
+#Party 2015-02-25 18:04:03.092638
+#Trade 2015-01-01 00:00:00
