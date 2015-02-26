@@ -55,12 +55,13 @@ class Parser:
         Method that parses line for database file to get timestamp
         Returns timestamp
         """
-        i = dt.now()
+        year = line.split()[1].split('-')[0]
+        month = line.split()[1].split('-')[1]
+        day = line.split()[1].split('-')[2]
+        hours = line.split()[2].split(':')[0]
+        minutes = line.split()[2].split(':')[1]
 
-        hours = int(line.split()[2].split(':')[0])
-        minutes = int(line.split()[2].split(':')[1])
-
-        return dt(int(i.year), int(i.month), int(i.day), hours, minutes)
+        return dt(int(year), int(month), int(day), int(hours), int(minutes))
 
 
     def parse_log_speaker(self, line):
@@ -112,9 +113,7 @@ class Parser:
         compares timestamps.txt from relevant log file and timestamps.txt and returns logical expression
         """
         if self.check_timestamp_exists_db(category_type.split('.')[0]):
-
-            #print "comparing for "+ category_type + " " + str(self.get_latest_timestamp_file(path)) + str(self.get_timestamp_db(category_type.split('.')[0]))
-
+            print "comparing " + str(self.get_latest_timestamp_file(path)) +" and " + str(self.get_timestamp_db(category_type.split('.')[0]))
             if self.get_latest_timestamp_file(path) > self.get_timestamp_db(category_type.split('.')[0]):
                 # create log which will be sent to server
                 return True
@@ -201,7 +200,7 @@ class Parser:
             remove(file_path)
             # Move new file
             move(abs_path, file_path)
-        except Exception,e:
+        except Exception, e:
             print str(e)
 
     def send_request(self, url_path, request, log_type):

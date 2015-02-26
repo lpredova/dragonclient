@@ -36,7 +36,6 @@ class Client:
 
     PATH_TO_LOGS_FOLDER = ""
 
-    PID = ""
     os = ""
 
     # user_character
@@ -61,7 +60,7 @@ class Client:
             self.os = "linux"
             # self.PATH_TO_LOGS_FOLDER = ""
             # UBUNTU 14.04
-            #self.PATH_TO_LOGS_FOLDER = "~/.local/share/mana/logs/"
+            # self.PATH_TO_LOGS_FOLDER = "~/.local/share/mana/logs/"
             self.PATH_TO_LOGS_FOLDER = os.path.join(os.path.sep, ".local", "share", "mana", "logs",
                                                     self.GAME_SERVER_IP, self.get_current_month(),
                                                     self.get_current_day())
@@ -85,7 +84,7 @@ class Client:
         elif _platform == "win32" or _platform == "cygwin":
 
             # Tested with "C:\Users\Toplomjer\AppData\Local\Mana"
-            #Windows 7
+            # Windows 7
             self.os = "win"
             self.PATH_TO_LOGS_FOLDER = os.path.join("C:\Users",
                                                     self.get_computer_user(), "AppData"
@@ -110,7 +109,13 @@ class Client:
                     return False
 
         if (self.os == "linux"):
-            print "linux"
+            try:
+                bashCommand = "manaplus"
+                process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+                self.start_process_listener()
+            except OSError as e:
+                if e.errno == os.errno.ENOENT:
+                    return False
 
         if (self.os == "win"):
             try:
@@ -128,11 +133,13 @@ class Client:
             running = False
             time.sleep(1)
             for proc in psutil.process_iter():
-                process = psutil.Process(proc.pid)  # Get the process info using PID
-                self.PID = proc.pid
-                if process.name() == "ManaPlus" or process.name() == "manaplus.exe":
-                    running = True
-                    print "..."
+                try:
+                    process = psutil.Process(proc.pid)  # Get the process info using PID
+                    if process.name() == "ManaPlus" or process.name() == "manaplus.exe" or process.name() == "manaplus":
+                        running = True
+                        print "..."
+                except:
+                    continue
 
             if time.time() - start_time > 3:  # no of seconds
                 self.get_chat_logs()
@@ -162,7 +169,7 @@ class Client:
 
         for log_file in files:
             if log_file == battle_file:
-                try :
+                try:
                     print "battle"
                     battle = Battle()
                     battle.get_battle_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, battle_file), self.character)
@@ -170,7 +177,7 @@ class Client:
                     continue
 
             elif log_file == debug_file:
-                try :
+                try:
                     print "debug"
                     debug = Debug()
                     debug.get_debug_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, debug_file), self.character)
@@ -209,7 +216,8 @@ class Client:
                 try:
                     print "whisper"
                     whisper = Whisper()
-                    whisper.get_whisper_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, log_file), log_file, self.character)
+                    whisper.get_whisper_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, log_file), log_file,
+                                                 self.character)
                 except:
                     continue
 
@@ -226,7 +234,6 @@ class Client:
             searchfile = open(os.path.join(self.PATH_TO_LOGS_FOLDER, '#Battle.log'), "r")
         except:
             searchfile = open(os.path.join(self.PATH_TO_LOGS_FOLDER, '#General.log'), "r")
-
 
         for line in searchfile:
             try:
