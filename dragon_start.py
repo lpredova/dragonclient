@@ -37,6 +37,7 @@ class Client:
     PATH_TO_LOGS_FOLDER = ""
 
     os = ""
+    process = ""
 
     # user_character
     character = ''
@@ -46,8 +47,12 @@ class Client:
 
     def __del__(self):
         self.send_chat_logs_to_server()
+        print self.process_name
         try:
-            os.kill(self.PID, signal.SIGKILL)
+            self.process.kill()
+            print "Killing Mana plus...\n"
+            print "Thank you for contribution. Goodbye \n"
+
         except BaseException:
             print "THANK YOU 4 CONTRIBUTION!"
 
@@ -103,6 +108,7 @@ class Client:
                 bashCommand = "open -a ManaPlus"
                 process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
                 output = process.communicate()[0]
+                self.process_name = "ManaPlus"
                 self.start_process_listener()
             except OSError as e:
                 if e.errno == os.errno.ENOENT:
@@ -112,6 +118,7 @@ class Client:
             try:
                 bashCommand = "manaplus"
                 process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+                self.process_name = "manaplus"
                 self.start_process_listener()
             except OSError as e:
                 if e.errno == os.errno.ENOENT:
@@ -120,6 +127,7 @@ class Client:
         if (self.os == "win"):
             try:
                 bashCommand = "C:\Program Files (x86)\Mana\manaplus.exe"
+                self.process_name = "manaplus.exe"
                 process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
                 self.start_process_listener()
             except OSError as e:
@@ -129,19 +137,24 @@ class Client:
     def start_process_listener(self):
         print "I'm listening..."
         start_time = time.time()
-        while (1):
+        while 1:
             running = False
-            time.sleep(1)
+            # time.sleep(1)
+
             for proc in psutil.process_iter():
                 try:
                     process = psutil.Process(proc.pid)  # Get the process info using PID
                     if process.name() == "ManaPlus" or process.name() == "manaplus.exe" or process.name() == "manaplus":
+                        self.process = process
                         running = True
                         print "..."
+                except (KeyboardInterrupt, SystemExit):
+                    return 0
+
                 except:
                     continue
 
-            if time.time() - start_time > 3:  # no of seconds
+            if time.time() - start_time > 2:  # no of seconds
                 self.get_chat_logs()
                 start_time = time.time()
 
@@ -281,5 +294,9 @@ class Client:
 
 if __name__ == '__main__':
     client = Client()
-    client.check_os()
-    client.start_mana_plus()
+
+    try:
+        client.check_os()
+        client.start_mana_plus()
+    except (KeyboardInterrupt, SystemExit):
+        print "Goodbye"
