@@ -126,6 +126,11 @@ class Client:
                 process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
                 self.start_process_listener()
             except OSError as e:
+                bashCommand = "C:\Program Files\Mana\manaplus.exe"
+                self.process_name = "manaplus.exe"
+                process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+                self.start_process_listener()
+            except:
                 if e.errno == os.errno.ENOENT:
                     return False
 
