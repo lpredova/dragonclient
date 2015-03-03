@@ -1,0 +1,16 @@
+#Install manaplus
+sudo apt-get install manaplus
+
+#Get Python dependancies
+sudo apt-get install python-setuptools python-dev build-essential
+
+#Install PIP
+sudo apt-get install python-pip
+
+
+#Installing dependancies
+sudo pip install psutil
+
+
+
+

@@ -1,0 +1,8 @@
+#Install Manaplus client
+http://manaplus.org/
+
+#Install Python 2.7.9
+https://www.python.org/downloads/windows/
+
+#Install Ps util
+https://pypi.python.org/pypi/psutil

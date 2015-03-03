@@ -66,25 +66,20 @@ class Client:
             # self.PATH_TO_LOGS_FOLDER = ""
             # UBUNTU 14.04
             # self.PATH_TO_LOGS_FOLDER = "~/.local/share/mana/logs/"
-            self.PATH_TO_LOGS_FOLDER = os.path.join(os.path.sep, ".local", "share", "mana", "logs",
+            # self.PATH_TO_LOGS_FOLDER = "/home/oss3/.local/share/mana/logs/"
+            self.PATH_TO_LOGS_FOLDER = os.path.join(os.path.sep, "home", self.get_computer_user(), ".local", "share",
+                                                    "mana", "logs",
                                                     self.GAME_SERVER_IP, self.get_current_month(),
                                                     self.get_current_day())
 
         elif _platform == "darwin":
             self.os = "mac"
-            # produciton code
             self.PATH_TO_LOGS_FOLDER = os.path.join(os.path.sep, "Users", self.get_computer_user(),
                                                     "Library", "Application Support",
                                                     "ManaPlus", "logs",
                                                     self.GAME_SERVER_IP, self.get_current_month(),
                                                     self.get_current_day())
 
-            # testing code
-            '''self.PATH_TO_LOGS_FOLDER = os.path.join(os.path.sep, "Users", self.get_computer_user(),
-                                                    "Library", "Application Support",
-                                                    "ManaPlus", "logs",
-                                                    self.GAME_SERVER_IP, "2015-01",
-                                                    "21")'''
 
         elif _platform == "win32" or _platform == "cygwin":
 
@@ -139,7 +134,7 @@ class Client:
         start_time = time.time()
         while 1:
             running = False
-            # time.sleep(1)
+            time.sleep(1)
 
             for proc in psutil.process_iter():
                 try:
@@ -154,7 +149,7 @@ class Client:
                 except:
                     continue
 
-            if time.time() - start_time > 2:  # no of seconds
+            if time.time() - start_time > 4:  # no of seconds
                 self.get_chat_logs()
                 start_time = time.time()
 
@@ -178,89 +173,88 @@ class Client:
             return 0
         files = [f for f in listdir(self.PATH_TO_LOGS_FOLDER) if isfile(join(self.PATH_TO_LOGS_FOLDER, f))]
 
-        self.character = self.get_character()
-
         for log_file in files:
-            if log_file == battle_file:
-                try:
-                    print "battle"
-                    battle = Battle()
-                    battle.get_battle_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, battle_file), self.character)
-                except:
+                if log_file == battle_file:
+                    try:
+                        print "battle"
+                        battle = Battle()
+                        battle.get_battle_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, battle_file), self.character)
+                    except:
+                        continue
+
+                elif log_file == debug_file:
+                    try:
+                        print "debug"
+                        debug = Debug()
+                        debug.get_debug_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, debug_file), self.character)
+                    except:
+                        continue
+
+                elif log_file == general_file:
+                    try:
+                        print "general"
+                        general = General()
+                        general.get_general_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, general_file),
+                                                     self.character)
+                    except:
+                        continue
+
+                elif log_file == party_file:
+                    try:
+                        print "party"
+                        party = Party()
+                        party.get_party_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, party_file), self.character)
+                    except:
+                        continue
+
+                elif log_file == trade_file:
+                    try:
+                        print "trade"
+                        trade = Trade()
+                        trade.get_trades_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, trade_file), self.character)
+                    except:
+                        continue
+
+                elif log_file[0] == ".":
                     continue
 
-            elif log_file == debug_file:
-                try:
-                    print "debug"
-                    debug = Debug()
-                    debug.get_debug_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, debug_file), self.character)
-                except:
-                    continue
-
-            elif log_file == general_file:
-                try:
-                    print "general"
-                    general = General()
-                    general.get_general_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, general_file), self.character)
-                except:
-                    continue
-
-            elif log_file == party_file:
-                try:
-                    print "party"
-                    party = Party()
-                    party.get_party_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, party_file), self.character)
-                except:
-                    continue
-
-            elif log_file == trade_file:
-                try:
-                    print "trade"
-                    trade = Trade()
-                    trade.get_trades_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, trade_file), self.character)
-                except:
-                    continue
-
-            elif log_file[0] == ".":
-                continue
-
-            # if log is nothing frome above then(probably) we have whisper log
-            else:
-                try:
-                    print "whisper"
-                    whisper = Whisper()
-                    whisper.get_whisper_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, log_file), log_file,
-                                                 self.character)
-                except:
-                    continue
+                # if log is nothing frome above then(probably) we have whisper log
+                else:
+                    try:
+                        print "whisper"
+                        whisper = Whisper()
+                        whisper.get_whisper_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, log_file), log_file,
+                                                     self.character)
+                    except:
+                        continue
 
     def get_character(self):
         """
         Method that gets user char and checks if it exists on server
         returns char name
         """
-
         BASE_URL = 'http://178.62.125.198:5000/mw/api/v1/'
+        chosen = False
 
-        character = ''
-        try:
-            searchfile = open(os.path.join(self.PATH_TO_LOGS_FOLDER, '#Battle.log'), "r")
-        except:
-            searchfile = open(os.path.join(self.PATH_TO_LOGS_FOLDER, '#General.log'), "r")
+        while not chosen:
+            character = raw_input("Name of character you will play today: ")
 
-        for line in searchfile:
             try:
-                character = line.split(']')[1].split(':')[0].lstrip()
-                character = {"character": character}
+                char = {"character": character}
+                character = {"character": {"character": character}}
                 payload = json.dumps(character)
                 headers = {'content-type': 'application/json'}
 
                 r = requests.post(BASE_URL + "user", data=payload, headers=headers)
                 data = r.json()
                 if data["status"] == "200":
-                    return character
-            except:
-                continue
+                    chosen = True
+                    self.character = char
+                    self.start_mana_plus()
+
+            except KeyboardInterrupt,SystemExit:
+                return 0
+
 
 
     def send_chat_logs_to_server(self):
@@ -294,9 +288,5 @@ class Client:
 
 if __name__ == '__main__':
     client = Client()
-
-    try:
-        client.check_os()
-        client.start_mana_plus()
-    except (KeyboardInterrupt, SystemExit):
-        print "Goodbye"
+    client.check_os()
+    client.get_character()
