@@ -26,7 +26,6 @@ class Debug(Parser):
         """
 
         last_timestamp = self.get_timestamp_db('#Debug')
-        request = {}
         debugs = []
 
         searchfile = open(path, "r")
@@ -37,14 +36,15 @@ class Debug(Parser):
                 i = self.parse_log_timestamp(line)
                 event["time"] = "%s-%s-%s %s:%s" % (i.year, i.month, i.day, i.hour, i.minute)
                 try:
-                    event["event"] = self.parse_log_text_data(line).split(']')[1].replace(']', "").replace('[', "")\
+                    event["event"] = self.parse_log_text_data(line).split(']')[1].replace(']', "").replace('[', "") \
                         .strip()
+                    debugs.append(event)
                 except:
-                    event["event"] = self.parse_log_text_data(line).split(']')[0].replace(']', "").replace('[', "")\
+                    event["event"] = self.parse_log_text_data(line).split(']')[0].replace(']', "").replace('[', "") \
                         .strip()
-                debugs.append(event)
+                    debugs.append(event)
 
-        request["debug"] = debugs
-        request["character"] = self.character
+        request = {"debug": debugs,
+                   "character": self.character}
 
-        self.send_request(self.url, request,'#Debug')
+        self.send_request(self.url, request, '#Debug')

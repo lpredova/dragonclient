@@ -113,7 +113,9 @@ class Parser:
         compares timestamps.txt from relevant log file and timestamps.txt and returns logical expression
         """
         if self.check_timestamp_exists_db(category_type.split('.')[0]):
-            print "comparing " + str(self.get_latest_timestamp_file(path)) +" and " + str(self.get_timestamp_db(category_type.split('.')[0]))
+            #print "comparing " + str(self.get_latest_timestamp_file(path)) + " and " + str(
+            #    self.get_timestamp_db(category_type.split('.')[0]))
+
             if self.get_latest_timestamp_file(path) > self.get_timestamp_db(category_type.split('.')[0]):
                 # create log which will be sent to server
                 return True
@@ -210,17 +212,19 @@ class Parser:
         :param url_path:
         :param request:
         """
-        payload = json.dumps(request)
-        print payload
-        headers = {'content-type': 'application/json'}
-        r = requests.post(self.BASE_URL + url_path, data=payload, headers=headers)
+        try:
+            payload = json.dumps(request, ensure_ascii=False)
+            headers = {'content-type': 'application/json'}
+            r = requests.post(self.BASE_URL + url_path, data=payload, headers=headers)
 
-        print log_type + "  " + self.BASE_URL + url_path + "   " + payload
+            #print log_type + "  " + self.BASE_URL + url_path + "   " + payload
+            data = r.json()
+            if data["status"] == "200":
+                if self.set_timestamp_db(log_type, dt.now()):
+                    print log_type + " saved"
+                else:
+                    print "failed writing timestamps"
 
-        data = r.json()
-        if data["status"] == "200":
+        except Exception, e:
+            print e
 
-            if self.set_timestamp_db(log_type, dt.now()):
-                print "timestamps updated..."
-            else:
-                print "failed"

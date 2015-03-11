@@ -63,7 +63,6 @@ class Client:
         """
         if _platform == "linux" or _platform == "linux2":
             self.os = "linux"
-            # self.PATH_TO_LOGS_FOLDER = ""
             # UBUNTU 14.04
             # self.PATH_TO_LOGS_FOLDER = "~/.local/share/mana/logs/"
             # self.PATH_TO_LOGS_FOLDER = "/home/oss3/.local/share/mana/logs/"
@@ -147,7 +146,7 @@ class Client:
                     if process.name() == "ManaPlus" or process.name() == "manaplus.exe" or process.name() == "manaplus":
                         self.process = process
                         running = True
-                        print "..."
+
                 except (KeyboardInterrupt, SystemExit):
                     return 0
 
@@ -174,6 +173,7 @@ class Client:
         trade_file = '#Trade.log'
 
         if not os.path.exists(self.PATH_TO_LOGS_FOLDER):
+            print self.PATH_TO_LOGS_FOLDER
             print "path does not exist"
             return 0
         files = [f for f in listdir(self.PATH_TO_LOGS_FOLDER) if isfile(join(self.PATH_TO_LOGS_FOLDER, f))]
@@ -181,7 +181,6 @@ class Client:
         for log_file in files:
                 if log_file == battle_file:
                     try:
-                        print "battle"
                         battle = Battle()
                         battle.get_battle_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, battle_file), self.character)
                     except:
@@ -189,7 +188,6 @@ class Client:
 
                 elif log_file == debug_file:
                     try:
-                        print "debug"
                         debug = Debug()
                         debug.get_debug_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, debug_file), self.character)
                     except:
@@ -197,7 +195,6 @@ class Client:
 
                 elif log_file == general_file:
                     try:
-                        print "general"
                         general = General()
                         general.get_general_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, general_file),
                                                      self.character)
@@ -206,7 +203,6 @@ class Client:
 
                 elif log_file == party_file:
                     try:
-                        print "party"
                         party = Party()
                         party.get_party_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, party_file), self.character)
                     except:
@@ -214,7 +210,6 @@ class Client:
 
                 elif log_file == trade_file:
                     try:
-                        print "trade"
                         trade = Trade()
                         trade.get_trades_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, trade_file), self.character)
                     except:
@@ -226,7 +221,6 @@ class Client:
                 # if log is nothing frome above then(probably) we have whisper log
                 else:
                     try:
-                        print "whisper"
                         whisper = Whisper()
                         whisper.get_whisper_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, log_file), log_file,
                                                      self.character)
