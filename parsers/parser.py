@@ -19,7 +19,7 @@ import requests
 class Parser:
     user_char = ''
 
-    BASE_URL = 'http://178.62.125.198:5000/mw/api/v1/'
+    BASE_URL = 'http://dragon.foi.hr:5000/mw/api/v1/'
 
     latest_timestamp = ''
     timestamps_db_file = 'timestamps.txt'

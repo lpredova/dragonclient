@@ -13,7 +13,6 @@ from os import listdir
 from os.path import isfile, join
 
 import subprocess
-import signal
 import psutil
 import time
 import getpass
@@ -32,7 +31,7 @@ import json
 
 class Client:
     # constants
-    GAME_SERVER_IP = "178.62.125.198"  # or address
+    GAME_SERVER_IP = "161.53.120.2"  # or address
 
     PATH_TO_LOGS_FOLDER = ""
 
@@ -47,7 +46,6 @@ class Client:
 
     def __del__(self):
         self.send_chat_logs_to_server()
-        print self.process_name
         try:
             self.process.kill()
             print "Killing Mana plus...\n"
@@ -62,10 +60,8 @@ class Client:
         Method that checks users OS and sets params
         """
         if _platform == "linux" or _platform == "linux2":
-            self.os = "linux"
             # UBUNTU 14.04
-            # self.PATH_TO_LOGS_FOLDER = "~/.local/share/mana/logs/"
-            # self.PATH_TO_LOGS_FOLDER = "/home/oss3/.local/share/mana/logs/"
+            self.os = "linux"
             self.PATH_TO_LOGS_FOLDER = os.path.join(os.path.sep, "home", self.get_computer_user(), ".local", "share",
                                                     "mana", "logs",
                                                     self.GAME_SERVER_IP, self.get_current_month(),
@@ -81,8 +77,6 @@ class Client:
 
 
         elif _platform == "win32" or _platform == "cygwin":
-
-            # Tested with "C:\Users\Toplomjer\AppData\Local\Mana"
             # Windows 7
             self.os = "win"
             self.PATH_TO_LOGS_FOLDER = os.path.join("C:\Users",
@@ -173,66 +167,65 @@ class Client:
         trade_file = '#Trade.log'
 
         if not os.path.exists(self.PATH_TO_LOGS_FOLDER):
-            print self.PATH_TO_LOGS_FOLDER
-            print "path does not exist"
+            print "Path does not exist  yet, please write something to chat to create folders..."
             return 0
         files = [f for f in listdir(self.PATH_TO_LOGS_FOLDER) if isfile(join(self.PATH_TO_LOGS_FOLDER, f))]
 
         for log_file in files:
-                if log_file == battle_file:
-                    try:
-                        battle = Battle()
-                        battle.get_battle_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, battle_file), self.character)
-                    except:
-                        continue
-
-                elif log_file == debug_file:
-                    try:
-                        debug = Debug()
-                        debug.get_debug_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, debug_file), self.character)
-                    except:
-                        continue
-
-                elif log_file == general_file:
-                    try:
-                        general = General()
-                        general.get_general_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, general_file),
-                                                     self.character)
-                    except:
-                        continue
-
-                elif log_file == party_file:
-                    try:
-                        party = Party()
-                        party.get_party_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, party_file), self.character)
-                    except:
-                        continue
-
-                elif log_file == trade_file:
-                    try:
-                        trade = Trade()
-                        trade.get_trades_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, trade_file), self.character)
-                    except:
-                        continue
-
-                elif log_file[0] == ".":
+            if log_file == battle_file:
+                try:
+                    battle = Battle()
+                    battle.get_battle_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, battle_file), self.character)
+                except:
                     continue
 
-                # if log is nothing frome above then(probably) we have whisper log
-                else:
-                    try:
-                        whisper = Whisper()
-                        whisper.get_whisper_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, log_file), log_file,
-                                                     self.character)
-                    except:
-                        continue
+            elif log_file == debug_file:
+                try:
+                    debug = Debug()
+                    debug.get_debug_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, debug_file), self.character)
+                except:
+                    continue
+
+            elif log_file == general_file:
+                try:
+                    general = General()
+                    general.get_general_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, general_file),
+                                                 self.character)
+                except:
+                    continue
+
+            elif log_file == party_file:
+                try:
+                    party = Party()
+                    party.get_party_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, party_file), self.character)
+                except:
+                    continue
+
+            elif log_file == trade_file:
+                try:
+                    trade = Trade()
+                    trade.get_trades_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, trade_file), self.character)
+                except:
+                    continue
+
+            elif log_file[0] == ".":
+                continue
+
+            # if log is nothing frome above then(probably) we have whisper log
+            else:
+                try:
+                    whisper = Whisper()
+                    whisper.get_whisper_log_data(os.path.join(self.PATH_TO_LOGS_FOLDER, log_file), log_file,
+                                                 self.character)
+                except:
+                    continue
 
     def get_character(self):
         """
         Method that gets user char and checks if it exists on server
         returns char name
         """
-        BASE_URL = 'http://178.62.125.198:5000/mw/api/v1/'
+        BASE_URL = 'http://161.53.120.2:5000/mw/api/v1/'
         chosen = False
 
         while not chosen:
@@ -243,17 +236,17 @@ class Client:
                 character = {"character": {"character": character}}
                 payload = json.dumps(character)
                 headers = {'content-type': 'application/json'}
-
                 r = requests.post(BASE_URL + "user", data=payload, headers=headers)
                 data = r.json()
-                if data["status"] == "200":
+
+                if data['status'] == "200":
                     chosen = True
                     self.character = char
                     self.start_mana_plus()
 
-            except KeyboardInterrupt,SystemExit:
+            except Exception, e:
+                print str(e)
                 return 0
-
 
 
     def send_chat_logs_to_server(self):
